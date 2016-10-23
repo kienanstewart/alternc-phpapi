@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpdoc>
+  <parser>
+    <default-package-name>AlternC PHP API</default-package-name>
+    <target>build/phpdocs</target>
+    <extensions>
+      <extension>php</extension>
+    </extensions>
+    <files>
+      <directory>./src</directory>
+    </files>
+  </parser>
+  <transformer>
+    <target>build/phpdocs/responsive</target>
+  </transformer>
+  <transformations>
+    <template name="clean"/>
+  </transformations>
+</phpdoc>

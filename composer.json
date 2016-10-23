@@ -1,0 +1,27 @@
+{
+    "name": "AlternC PHP API Client",
+    "description": "Provides a PHP API Client to communicate with AlternC installs",
+    "type": "library",
+    "license": "X11 License",
+    "keywords": [
+        "alternc"
+    ],
+    "require": {
+        "php" : "^5.6 || ^7.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4 || ~5",
+	"phpdocumentor/phpdocumentor": "2.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "AlternCApi\\": "src/AlternCApi"
+       }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "AlternCApi\\Tests\\": "tests/"
+        }
+    }
+}
+
