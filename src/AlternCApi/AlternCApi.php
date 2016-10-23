@@ -10,6 +10,7 @@
 namespace AlternCApi;
 
 use AlternCApi\Exceptions\AlternCApiException;
+use AlternCApi\AlternCAccount;
 
 /**
  * Class AlternCApi.
@@ -227,12 +228,39 @@ class AlternCApi {
    }
 
    /**
+    * @param string $object The alternc name of the object.
+    * @param string $action The alternc action to request.
+    * @param array $params  The parameters to the request.
+    */
+   public function objectRequest($object, $action, $params = array()) {
+      if ($this->api_style == static::API_STYLE_POST) {
+         $params['object'] = $object;
+         $params['action'] = $action;
+      }
+      return $this->request($this->getEndpointPath($object, $action), $params);
+   }
+
+   /**
+    * A simpler interface for sending request than sendRequest
+    *
+    * @param string $path The path.
+    * @param array $params Request parameters.
+    *
+    * @returns AlternCResponse response object.
+    */
+   public function request($path, $params = array()) {
+      return $this->sendRequest($this->request_method, $path, $this->token, $params);
+   }
+
+   /**
     * Creates and sends a request.
     *
     * @param string $method The request method, eg. GET, POST, ...
     * @param string $path The request path.
     * @param string $token The token used to authenticate the request
     * @param array $params Query paramters for the request.
+    *
+    * @returns AlternCResponse response object.
     */
    public function sendRequest($method, $path, $token = '', $params = array()) {
       $request = new AlternCRequest($this, $method, $path, $token, $params);
@@ -245,12 +273,20 @@ class AlternCApi {
    public function _sendRequest(AlternCRequest $request) {
       $client_args = array(
          'headers' => $request->getHeaders(),
+         'query' => array(),
       );
       if ($request->getMethod() == static::REQUEST_METHOD_POST) {
          $client_args['json'] = $request->getParams();
+         if ($this->token) {
+            $client_args['query'] = array('token' => $this->token);
+         }
+         //unset($client_args['json']['token']);
       } else if ($request->getMethod() == static::REQUEST_METHOD_GET) {
          $client_args['query'] = $request->getParams();
       }
+      print_r(array($request->getMethod(),
+                    $request->getPath(),
+                    $client_args));
       $response = $this->client->request($request->getMethod(), $request->getPath(), $client_args);
       return new AlternCResponse($response);
    }
@@ -261,6 +297,78 @@ class AlternCApi {
 
    public function getURL() {
       return $this->url;
+   }
+
+   /**
+    * Returns the endpoint based on the object, action, and api_style.
+    */
+   public function getEndpointPath($object, $action) {
+      if ($this->api_style == static::API_STYLE_POST) {
+         return "api/post";
+      }
+      else {
+         return "api/rest/{$object}/{$action}";
+      }
+   }
+
+   /**
+    * Searches for alternc accounts.
+    *
+    * @param string $key The key to filter by. One of: uid, login, domain, creator.
+    * @param string $value The value of the key to filter by: int for uid, creator; string for login, domain.
+    *
+    * @returns array An array of AlternCAccount objects indexed by uid.
+    */
+   public function find_accounts($key = '', $value = '') {
+      $args = array();
+      if ($key) {
+         $args[$key] = $value;
+      }
+      $response = $this->objectRequest('account', 'find', $args);
+      $users = array();
+      print_r($response->getBody()->content);
+      foreach ($response->getBody()->content as $id => $data) {
+         $params = array();
+         $users[$data->uid] = new AlternCAccount($this, $data->uid, $data->login, $data->prenom,
+                                          $data->nom, $data->mail, array(
+                                             'muid' => $data->muid,
+                                             'pass' => $data->pass,
+                                             'su' => $data->su,
+                                             'lastaskpass' => $data->lastaskpass,
+                                             'lastfail' => $data->lastfail,
+                                             'lastip' => $data->lastip,
+                                             'creator' => $data->creator,
+                                             'canpass' => $data->canpass,
+                                             'warnlogin' => $data->warnlogin,
+                                             'warnfailed' => $data->warnfailed,
+                                             'admlist' => $data->admlist,
+                                             'type' => $data->type,
+                                             'db_server_id' => $data->db_server_id,
+                                             'notes' => $data->notes,
+                                             'created' => $data->created,
+                                             'duration' => $data->duration,
+                                             'parentlogin' => $data->parentlogin,
+                                             'expiry' => $data->expiry,
+                                             'status' => $data->status,
+                                             ));
+      }
+      return $users;
+   }
+
+   public function add_account($login, $mail, $password, $first_name, $last_name) {
+      $params  = array(
+         'login' => $login,
+         'mail' => $mail,
+         'pass' => $password,
+         'nom' => $last_name,
+         'prenom' => $first_name
+      );
+      $response = $this->objectRequest('account', 'add', $params);
+      if ($response_body = $response->getBody()) {
+         $user = $this->find_accounts('uid', $response_body->content)[$response_body->content];
+         return $user;
+      }
+      return FALSE;
    }
 
 }

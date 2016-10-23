@@ -28,6 +28,11 @@ class AlternCResponse {
     */
    public function __construct(\GuzzleHttp\Psr7\Response $response) {
       $this->raw_response = $response;
+      // @TODO Raise an exception if code != 200 || content['code'] is set.
+      print_r(array(
+                 $response->getStatusCode(),
+                 $response->getReasonPhrase()
+                 ));
    }
 
    /**
@@ -38,6 +43,8 @@ class AlternCResponse {
       if (!$this->response) {
          $this->response = json_decode($this->raw_response->getBody());
       }
+      // 'content' usually has the answer, except for the auth requests, so we send it all
+      // and let the caller figure it out.
       return $this->response;
    }
 

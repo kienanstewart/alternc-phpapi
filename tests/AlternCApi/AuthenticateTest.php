@@ -10,7 +10,6 @@
 namespace AlternCApi\Tests;
 
 use AlternCApi\AlternCApi;
-//use AlternCApi\Tests\AlternCApi\TestCredentials;
 
 /**
  * @backupGlobals disabled

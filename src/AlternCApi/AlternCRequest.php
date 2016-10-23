@@ -106,7 +106,7 @@ class AlternCRequest {
    public function getParams() {
       $extra = array();
       if ($this->token) {
-         $extra['token'] = $this->getToken();
+         $extra['token'] = $this->api->getToken();
       }
       return array_merge($extra, $this->params);
    }
