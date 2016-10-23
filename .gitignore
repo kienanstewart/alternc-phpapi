@@ -1,0 +1,4 @@
+build/
+vendor/
+composer.lock
+tests/AlternCApi/TestCredentials.php

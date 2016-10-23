@@ -75,7 +75,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase {
    /**
     * @expectedException \AlternCApi\Exceptions\AlternCApiException
     */
-   public function testInstantiatingWithoutUserForUserLoginThrows() {
+   public function testInstantiatingWithoutUserThrows() {
       putenv(AlternCApi::ALTERNC_USER_ENV_NAME.'=');
       $config = array(
          'url' => 'x',

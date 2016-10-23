@@ -12,4 +12,4 @@ error_reporting(E_ALL);
 date_default_timezone_set('America/Toronto');
 
 require __DIR__.'/../src/bootstrap.php';
-//require __DIR__.'/AlternCApi/TestCase.php';
+include_once __DIR__.'/AlternCApi/TestCredentials.php';
