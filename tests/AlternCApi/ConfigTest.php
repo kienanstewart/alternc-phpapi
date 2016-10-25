@@ -11,6 +11,9 @@ namespace AlternCApi\Tests;
 
 use AlternCApi\AlternCApi;
 
+/**
+ * @backupGlobals disabled
+ */
 class ConfigTest extends \PHPUnit_Framework_TestCase {
 
    /**

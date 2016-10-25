@@ -34,32 +34,91 @@ class AlternCAccount {
    }
 
    /**
+    * Is the account locked?
+    *
+    * @returns bool Whether or not the account is locked.
+    */
+   public function isLocked() {
+      return (!(bool) $this->info['enabled']);
+   }
+
+   /**
+    * Is the account admin?
+    *
+    * @returns bool Wether or not the account is an admin account.
+    */
+   public function isAdmin() {
+      return (bool) $this->info['su'];
+   }
+
+   /**
     * Lock the account.
+    *
+    * @returns bool TRUE if the action succeeded, FALSE otherwise.
     */
    public function lock() {
-      return $this->api->objectRequest('account', 'lock', array('uid' => $this->uid));
+      $response = $this->api->objectRequest('account', 'lock', array('uid' => $this->uid));
+      if ($response->getBody()->content) {
+         // Rather than re-request the whole user.
+         $this->info['enabled'] = 0;
+         return TRUE;
+      }
+      return FALSE;
    }
 
    /**
     * Unlock the account.
+    *
+    * @returns bool TRUE is the action succeeded, FALSE otherwise.
     */
    public function unlock() {
-      return $this->api->objectRequest('account', 'unlock', array('uid' => $this->uid));
+      $response = $this->api->objectRequest('account', 'unlock', array('uid' => $this->uid));
+      if ($response->getBody()->content) {
+         $this->info['enabled'] = 1;
+         return TRUE;
+      }
+      return FALSE;
    }
 
    /**
     * Delete the account.
+    *
+    * @returns bool TRUE if the action succeeded, FALSE otherwise.
     */
    public function delete() {
-      return $this->api->objectRequest('account', 'del', array('uid' => $this->uid));
+      $response = $this->api->objectRequest('account', 'del', array('uid' => $this->uid));
+      if ($response->getBody()->content) {
+         return TRUE;
+      }
+      return FALSE;
    }
 
+   /**
+    * Set the account to have admin privileges.
+    *
+    * @returns bool TRUE if the action succeeded, FALSE otherwise.
+    */
    public function setAdmin() {
-      $this->api->objectRequest('account', 'setAdmin', array('uid' => $this->uid));
+      $response = $this->api->objectRequest('account', 'setAdmin', array('uid' => $this->uid));
+      if ($response->getBody()->content) {
+         $this->info['su'] = 1;
+         return TRUE;
+      }
+      return FALSE;
    }
 
+   /**
+    * Remove admin privileges from the account.
+    *
+    * @returns bool TRUE if the action succeeded, FALSE otherwise.
+    */
    public function unsetAdmin() {
-      $this->api->objectRequest('account', 'unsetAdmin', array('uid' => $this->uid));
+      $response = $this->api->objectRequest('account', 'unsetAdmin', array('uid' => $this->uid));
+      if ($response->getBody()->content) {
+         $this->info['su'] = 0;
+         return TRUE;
+      }
+      return FALSE;
    }
 
    public function getUid() {

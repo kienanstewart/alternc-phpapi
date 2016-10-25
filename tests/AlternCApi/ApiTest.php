@@ -49,8 +49,9 @@ class ApiTest extends \PHPUnit_FrameWork_TestCase {
       $response = $api->add_account('test', 'test@example.com', 'test', 'test', 'test');
       $this->assertInstanceOf('AlternCApi\AlternCAccount', $response);
       $id = $response->getUid();
-      $response->delete();
-      $this->assertEmpty($api->find_accounts('uid', $id));
+      $this->assertTrue($response->delete());
+      $r = $api->find_accounts('uid', $id);
+      $this->assertArrayNotHasKey($id, $r);
    }
 
 }

@@ -29,10 +29,6 @@ class AlternCResponse {
    public function __construct(\GuzzleHttp\Psr7\Response $response) {
       $this->raw_response = $response;
       // @TODO Raise an exception if code != 200 || content['code'] is set.
-      print_r(array(
-                 $response->getStatusCode(),
-                 $response->getReasonPhrase()
-                 ));
    }
 
    /**

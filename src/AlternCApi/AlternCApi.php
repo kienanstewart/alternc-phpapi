@@ -276,17 +276,18 @@ class AlternCApi {
          'query' => array(),
       );
       if ($request->getMethod() == static::REQUEST_METHOD_POST) {
-         $client_args['json'] = $request->getParams();
+         // Although the documentation in api/index.php suggests the POSTed requests
+         // should encode the data in JSON format, the actual index uses the
+         // regular PHP $_POST, so all the information is included as form_params
+         // instead.
+         $client_args['form_params'] = $request->getParams();
          if ($this->token) {
-            $client_args['query'] = array('token' => $this->token);
+            $client_args['form_params']['token'] = $this->token;
          }
          //unset($client_args['json']['token']);
       } else if ($request->getMethod() == static::REQUEST_METHOD_GET) {
          $client_args['query'] = $request->getParams();
       }
-      print_r(array($request->getMethod(),
-                    $request->getPath(),
-                    $client_args));
       $response = $this->client->request($request->getMethod(), $request->getPath(), $client_args);
       return new AlternCResponse($response);
    }
@@ -317,6 +318,14 @@ class AlternCApi {
     * @param string $key The key to filter by. One of: uid, login, domain, creator.
     * @param string $value The value of the key to filter by: int for uid, creator; string for login, domain.
     *
+    * While AlternC says the the uid & creator finds are "strict", if one
+    * deletes a user by uid, then do find_accounts('uid', $deleted_id),
+    * AlternC returns a list of _all_ accounts instead of saying there is
+    * no such account by that ID. To check that an account is deleted, you
+    * must therefore iterate through the array that is returned by this and make
+    * sure the key you are expecting to have deleted is no longer there.
+    * yay AlternC!
+    *
     * @returns array An array of AlternCAccount objects indexed by uid.
     */
    public function find_accounts($key = '', $value = '') {
@@ -326,7 +335,6 @@ class AlternCApi {
       }
       $response = $this->objectRequest('account', 'find', $args);
       $users = array();
-      print_r($response->getBody()->content);
       foreach ($response->getBody()->content as $id => $data) {
          $params = array();
          $users[$data->uid] = new AlternCAccount($this, $data->uid, $data->login, $data->prenom,
@@ -334,6 +342,7 @@ class AlternCApi {
                                              'muid' => $data->muid,
                                              'pass' => $data->pass,
                                              'su' => $data->su,
+                                             'enabled' => $data->enabled,
                                              'lastaskpass' => $data->lastaskpass,
                                              'lastfail' => $data->lastfail,
                                              'lastip' => $data->lastip,
