@@ -10,6 +10,7 @@
 namespace AlternCApi\Tests;
 
 use AlternCApi\AlternCApi;
+use AlternCApi\AlternCAccount;
 
 /**
  * @backupGlobals disabled
@@ -31,7 +32,7 @@ class AccountTest extends \PHPUnit_FrameWork_TestCase {
             'request_method' => 'GET',
          )
       );
-      $account = $api->add_account('test', 'test@example.com', 'test', 'test', 'test');
+      $account = AlternCAccount::add($api, 'test', 'test@example.com', 'test', 'test', 'test');
    }
 
    /**
@@ -40,6 +41,28 @@ class AccountTest extends \PHPUnit_FrameWork_TestCase {
    public static function after() {
       global $api, $account;
       $account->delete();
+   }
+
+   /**
+    * @group integration
+    */
+   public function testFind() {
+      global $api;
+      $response = AlternCAccount::find($api);
+      $this->assertInternalType('array', $response);
+   }
+
+   /**
+    * @group integration
+    */
+   public function testCreateAndDelete() {
+      global $api;
+      $response = AlternCAccount::add($api, 'best', 'best@example.com', 'best', 'best', 'best');
+      $this->assertInstanceOf('AlternCApi\AlternCAccount', $response);
+      $id = $response->getUid();
+      $this->assertTrue($response->delete());
+      $r = AlternCAccount::find($api, 'uid', $id);
+      $this->assertArrayNotHasKey($id, $r);
    }
 
    /**

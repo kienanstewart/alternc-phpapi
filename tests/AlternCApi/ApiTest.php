@@ -32,26 +32,4 @@ class ApiTest extends \PHPUnit_FrameWork_TestCase {
       );
    }
 
-   /**
-    * @group integration
-    */
-   public function testFind() {
-      global $api;
-      $response = $api->find_accounts();
-      $this->assertInternalType('array', $response);
-   }
-
-   /**
-    * @group integration
-    */
-   public function testCreateAndDelete() {
-      global $api;
-      $response = $api->add_account('test', 'test@example.com', 'test', 'test', 'test');
-      $this->assertInstanceOf('AlternCApi\AlternCAccount', $response);
-      $id = $response->getUid();
-      $this->assertTrue($response->delete());
-      $r = $api->find_accounts('uid', $id);
-      $this->assertArrayNotHasKey($id, $r);
-   }
-
 }
