@@ -50,7 +50,7 @@ class AlternCApi {
    /**
     * Permitted Request Methods.
     */
-   protected $request_methods = array(
+   protected static $request_methods = array(
       AlternCApi::REQUEST_METHOD_POST,
       AlternCApi::REQUEST_METHOD_GET,
    );
@@ -68,7 +68,7 @@ class AlternCApi {
    /**
     * Permitted API Styles.
     */
-   protected $api_styles = array(
+   protected static $api_styles = array(
       AlternCApi::API_STYLE_POST,
       AlternCApi::API_STYLE_REST,
    );
@@ -86,7 +86,7 @@ class AlternCApi {
    /**
     * Permitted login methods.
     */
-   protected $login_methods = array(
+   protected static $login_methods = array(
       AlternCApi::LOGIN_METHOD_SHARED_SECRET,
       AlternCApi::LOGIN_METHOD_USER,
    );
@@ -172,9 +172,9 @@ class AlternCApi {
          );
       }
       $limited_config_options = array(
-         'request_method' => $this->request_methods,
-         'login_method' => $this->login_methods,
-         'api_style' => $this->api_styles,
+         'request_method' => static::$request_methods,
+         'login_method' => static::$login_methods,
+         'api_style' => static::$api_styles,
       );
       foreach ($limited_config_options as $key => $values) {
          if (!in_array($config[$key], $values)) {
@@ -215,7 +215,7 @@ class AlternCApi {
          $params['secret'] = $this->secret;
          $params['login'] = $this->user;
       } else {
-         $params['user'] = $this->user;
+         $params['login'] = $this->user;
          $params['password'] = $this->secret;
       }
       $response = $this->sendRequest('GET', $login_paths[$this->login_method], '', $params);
@@ -310,6 +310,18 @@ class AlternCApi {
       else {
          return "api/rest/{$object}/{$action}";
       }
+   }
+
+   public static function getAvailableLoginMethods() {
+      return static::$login_methods;
+   }
+
+   public static function getAvailableApiStyles() {
+      return static::$api_styles;
+   }
+
+   public static function getAvailableRequestMethods() {
+      return static::$request_methods;
    }
 
 }

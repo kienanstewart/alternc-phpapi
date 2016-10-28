@@ -22,14 +22,15 @@ class DomainTest extends \PHPUnit_FrameWork_TestCase {
     */
    public static function init() {
       global $api;
-      $api = new AlternCApi(array(
-                               'url' => AlternCApiTestCredentials::$url,
-                               'user' => AlternCApiTestCredentials::$user,
-                               'secret' => AlternCApiTestCredentials::$secret,
-                               'login_method' => AlternCApiTestCredentials::$login_method,
-                               'token' => AlternCApiTestCredentials::$token,
-                               'request_method' => 'GET',
-                               )
+      $api = new AlternCApi(
+         array(
+            'url' => AlternCApiTestCredentials::$url,
+            'user' => AlternCApiTestCredentials::$user,
+            'secret' => AlternCApiTestCredentials::$secret[AlternCApiTestCredentials::$login_method],
+            'login_method' => AlternCApiTestCredentials::$login_method,
+            'token' => AlternCApiTestCredentials::$token,
+            'request_method' => 'GET',
+         )
       );
    }
 

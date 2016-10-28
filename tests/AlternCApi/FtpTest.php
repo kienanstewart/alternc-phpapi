@@ -28,7 +28,7 @@ class FtpTest extends \PHPUnit_FrameWork_TestCase {
          array(
             'url' => AlternCApiTestCredentials::$url,
             'user' => AlternCApiTestCredentials::$user,
-            'secret' => AlternCApiTestCredentials::$secret,
+            'secret' => AlternCApiTestCredentials::$secret[AlternCApiTestCredentials::$login_method],
             'login_method' => AlternCApiTestCredentials::$login_method,
             'token' => AlternCApiTestCredentials::$token,
             'request_method' => 'GET',

@@ -25,7 +25,7 @@ class AuthenticateTest extends \PHPUnit_FrameWork_TestCase {
       $api = new AlternCApi(array(
                                'url' => AlternCApiTestCredentials::$url,
                                'user' => AlternCApiTestCredentials::$user,
-                               'secret' => AlternCApiTestCredentials::$secret,
+                               'secret' => AlternCApiTestCredentials::$secret[AlternCApiTestCredentials::$login_method],
                                'login_method' => AlternCApiTestCredentials::$login_method,
                                'token' => AlternCApiTestCredentials::$token,
                                )
@@ -58,15 +58,29 @@ class AuthenticateTest extends \PHPUnit_FrameWork_TestCase {
     * @group integration
     */
    public function testGetNewAuthToken() {
-      $api = new AlternCApi(array(
-                               'url' => AlternCApiTestCredentials::$url,
-                               'user' => AlternCApiTestCredentials::$user,
-                               'secret' => AlternCApiTestCredentials::$secret,
-                               'login_method' => AlternCApiTestCredentials::$login_method,
-                               'token' => ''
-                               )
-      );
-      $this->assertTrue($api->authenticate());
+      $login_methods = AlternCApi::getAvailableLoginMethods(); //array('secret', 'user');
+      $api_styles = AlternCApi::getAvailableApiStyles(); //array('rest', 'post');
+      $request_methods = AlternCApi::getAvailableRequestMethods(); //array('GET', 'POST');
+      foreach ($login_methods as $login_method) {
+         foreach ($api_styles as $api_style) {
+            foreach ($request_methods as $request_method) {
+               print "Testing {$login_method} in {$api_style} style using {$request_method} requests...";
+               $api = new AlternCApi(
+                  array(
+                     'url' => AlternCApiTestCredentials::$url,
+                     'user' => AlternCApiTestCredentials::$user,
+                     'secret' => AlternCApiTestCredentials::$secret[$login_method],
+                     'login_method' => $login_method,
+                     'api_style' => $api_style,
+                     'request_method' => $request_method,
+                     'token' => '',
+                  )
+               );
+               $this->assertTrue($api->authenticate());
+               print " OK!\n";
+            }
+         }
+      }
    }
 
 }
